@@ -51,10 +51,10 @@ declare interface AnchorsConfig {
   strides: [number, number];
   anchors: [number, number];
 }
-const ANCHORS_CONFIG: AnchorsConfig = {
-  'strides': [8, 16],
-  'anchors': [2, 6]
-};
+// const ANCHORS_CONFIG: AnchorsConfig = {
+//   'strides': [8, 16],
+//   'anchors': [2, 6]
+// };
 
 // `NUM_LANDMARKS` is a fixed property of the model.
 const NUM_LANDMARKS = 6;
@@ -213,9 +213,10 @@ export class BlazeFaceModel {
     this.width = width;
     this.height = height;
     this.maxFaces = maxFaces;
+    const outputSpec = { strides: [width / 16, width / 8], anchors: [2, 6] };
     this.anchorsData = generateAnchors(
         width, height,
-        ANCHORS_CONFIG as
+        outputSpec as
             {strides: [number, number], anchors: [number, number]});
     this.anchors = tf.tensor2d(this.anchorsData);
     this.inputSizeData = [width, height];
@@ -235,12 +236,23 @@ export class BlazeFaceModel {
       tf.Tensor2D, tf.Tensor2D, tf.Tensor1D
     ] => {
       const resizedImage = tf.image.resizeBilinear(inputImage,
-        [this.width, this.height]);
+        [this.width, this.height]);      
       const normalizedImage = tf.mul(tf.sub(tf.div(resizedImage, 255), 0.5), 2);
 
       // [1, 897, 17] 1 = batch, 897 = number of anchors
       const batchedPrediction = this.blazeFaceModel.predict(normalizedImage);
-      const prediction = tf.squeeze((batchedPrediction as tf.Tensor3D));
+
+      let prediction;
+      if(this.width === 256) {
+        let batchPred = batchedPrediction as Array<tf.Tensor>;
+        const sorted = batchPred.sort((a, b) => a.size - b.size);
+        const concat384 = tf.concat([sorted[0], sorted[2]], 2); // dim: 384, 1 + 16
+        const concat512 = tf.concat([sorted[1], sorted[3]], 2); // dim: 512, 1 + 16
+        const concat = tf.concat([concat512, concat384], 1);
+        prediction = tf.squeeze(concat);
+      } else {
+        prediction = tf.squeeze((batchedPrediction as tf.Tensor3D));
+      }
 
       const decodedBounds =
           decodeBounds(prediction as tf.Tensor2D, this.anchors, this.inputSize);

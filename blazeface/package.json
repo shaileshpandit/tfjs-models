@@ -1,6 +1,6 @@
 {
-  "name": "@tensorflow-models/blazeface",
-  "version": "0.0.7",
+  "name": "blazeface-back",
+  "version": "0.0.8",
   "description": "Pretrained face detection model in TensorFlow.js",
   "main": "dist/index.js",
   "jsnext:main": "dist/blazeface.esm.js",
@@ -10,7 +10,7 @@
   "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tensorflow/tfjs-models.git"
+    "url": "https://github.com/shaileshpandit/tfjs-models.git"
   },
   "peerDependencies": {
     "@tensorflow/tfjs-converter": "^3.1.0",
