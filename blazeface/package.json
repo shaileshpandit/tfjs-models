@@ -1,6 +1,6 @@
 {
   "name": "blazeface-back",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Pretrained face detection model in TensorFlow.js",
   "main": "dist/index.js",
   "jsnext:main": "dist/blazeface.esm.js",

@@ -15,3 +15,7 @@ tslint.json
 yarn.lock
 yalc.lock
 cloudbuild.yml
+rollup.config.js
+run_tests.ts
+tsconfig.json
+tsconfig.test.json
